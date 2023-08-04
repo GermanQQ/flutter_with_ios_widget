@@ -4,11 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_swift_ios_widget/models.dart';
 import 'package:flutter_widgetkit/flutter_widgetkit.dart';
 
-const iOSGroupOld = 'group.flutterswiftioswidget';
 const iOSGroup = 'group.next.event.widget';
 const parsedStrForIOS = 'widgetData';
 
 class EventsViewModel extends ChangeNotifier {
+  // late Timer timer;
+
   final eventsList = <WidgetData>[
     WidgetData(name: "Meeting event", dayMonth: DateTime.now().add(const Duration(days: 4)), type: EventType.meeting),
     WidgetData(name: "Call event", dayMonth: DateTime.now().add(const Duration(days: 2)), type: EventType.call),
@@ -17,13 +18,14 @@ class EventsViewModel extends ChangeNotifier {
   ];
 
   WidgetData getFirstUpcomingEvent() {
+    if (eventsList.isEmpty) return WidgetData(dayMonth: DateTime.now(), type: EventType.none, name: "none");
     List<WidgetData> sortedEventsList = List.from(eventsList);
     sortedEventsList.sort((a, b) => a.dayMonth.compareTo(b.dayMonth));
     return sortedEventsList.first;
   }
 
   setNewEvent() {
-    eventsList.add(getRandomEvent());
+    eventsList.add(getRandomNewCommingEvent(getFirstUpcomingEvent()));
     notifyListeners();
 
     setIOSDataWidget();
@@ -33,34 +35,44 @@ class EventsViewModel extends ChangeNotifier {
     WidgetKit.setItem(parsedStrForIOS, getFirstUpcomingEvent().passJsonToNative(), iOSGroup);
     WidgetKit.reloadAllTimelines();
   }
+
+  // void _startTimer() {
+  //   timer = Timer.periodic(const Duration(seconds: 5), (timer) {
+  //     // DateTime now = DateTime.now();
+  //     eventsList.add(getRandomNewCommingEvent(getFirstUpcomingEvent()));
+  //     // A new minute has started, trigger your function here
+  //     setIOSDataWidget();
+  //     notifyListeners();
+  //   });
+  // }
 }
 
-WidgetData getRandomEvent() {
+WidgetData getRandomNewCommingEvent(WidgetData prevEvent) {
   final randomNum = Random().nextInt(3);
 
   switch (randomNum) {
     case 0:
       return WidgetData(
         name: "Call event",
-        dayMonth: DateTime.now().add(const Duration(days: 1)),
+        dayMonth: prevEvent.dayMonth.subtract(const Duration(hours: 1)),
         type: EventType.call,
       );
     case 1:
       return WidgetData(
         name: "Meeting event",
-        dayMonth: DateTime.now().add(const Duration(days: 1)),
+        dayMonth: prevEvent.dayMonth.subtract(const Duration(hours: 1)),
         type: EventType.meeting,
       );
     case 2:
       return WidgetData(
         name: "Conference event",
-        dayMonth: DateTime.now().add(const Duration(days: 1)),
+        dayMonth: prevEvent.dayMonth.subtract(const Duration(hours: 1)),
         type: EventType.conference,
       );
     default:
       return WidgetData(
         name: "None event",
-        dayMonth: DateTime.now().add(const Duration(days: 1)),
+        dayMonth: prevEvent.dayMonth.subtract(const Duration(hours: 1)),
         type: EventType.none,
       );
   }
