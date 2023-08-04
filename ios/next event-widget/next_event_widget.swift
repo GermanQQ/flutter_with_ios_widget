@@ -10,9 +10,9 @@ import SwiftUI
 import Intents
 
 struct Provider: IntentTimelineProvider {
-    //If you don't have any data, just preview
+    //If you don't have any data
     func placeholder(in context: Context) -> FlutterEntry {
-        FlutterEntry(date: Date(), configuration: ConfigurationIntent(), widgetData: WidgetData(dayMonth: "31/05", time: "12:40 AM", type: "call"))
+        FlutterEntry(date: Date(), configuration: ConfigurationIntent(), widgetData: WidgetData(dayMonth: "--/--", time: "--:-- AM", type: "none"))
     }
     
     //Current state of widget preview in galery to see how widget look with user data
@@ -37,6 +37,8 @@ struct Provider: IntentTimelineProvider {
 }
 
 struct FlutterEntry: TimelineEntry {
+    //date for follow TimelineEntry protocoll, to when to update widget
+    //but for flutter case we don't need it, becouse we update widget from flutter
     let date: Date
     let configuration: ConfigurationIntent
     

@@ -17,22 +17,25 @@ class EventsViewModel extends ChangeNotifier {
         name: "Conference event", dayMonth: DateTime.now().add(const Duration(days: 6)), type: EventType.conference),
   ];
 
-  WidgetData getFirstUpcomingEvent() {
-    if (eventsList.isEmpty) return WidgetData(dayMonth: DateTime.now(), type: EventType.none, name: "none");
+  WidgetData? getFirstUpcomingEvent() {
+    if (eventsList.isEmpty) return null;
     List<WidgetData> sortedEventsList = List.from(eventsList);
     sortedEventsList.sort((a, b) => a.dayMonth.compareTo(b.dayMonth));
     return sortedEventsList.first;
   }
 
   setNewEvent() {
-    eventsList.add(getRandomNewCommingEvent(getFirstUpcomingEvent()));
+    final event = getFirstUpcomingEvent();
+    if (event != null) eventsList.add(getRandomNewCommingEvent(event));
     notifyListeners();
 
     setIOSDataWidget();
   }
 
   setIOSDataWidget() {
-    WidgetKit.setItem(parsedStrForIOS, getFirstUpcomingEvent().passJsonToNative(), iOSGroup);
+    final event = getFirstUpcomingEvent();
+    if (event == null) return;
+    WidgetKit.setItem(parsedStrForIOS, event.passJsonToNative(), iOSGroup);
     WidgetKit.reloadAllTimelines();
   }
 
